@@ -1,0 +1,59 @@
+name: Update outage calendar
+
+on:
+  schedule:
+    # Every 15 minutes. GitHub runs scheduled jobs on a best-effort basis,
+    # so a run can start a few minutes late.
+    - cron: "7,22,37,52 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-calendar
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      # Reads the Telegram channels, updates state/ and docs/*.ics.
+      # Exits with an error (GitHub then emails the owner) when the newest schedule image cannot be read.
+      - name: Update calendar
+        run: python -m outage_calendar
+
+      - name: Commit changes
+        if: always()
+        run: |
+          git config user.name "outage-calendar-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add docs state
+          if git diff --cached --quiet; then
+            echo "No changes."
+          else
+            git commit -m "Update calendar"
+            git pull --rebase -q origin "${GITHUB_REF_NAME}"
+            git push
+          fi
+
+      # GitHub switches off scheduled workflows in repositories with no activity for 60 days.
+      # If nothing was committed for a month, make one empty commit.
+      - name: Keep the schedule alive
+        run: |
+          last=$(git log -1 --format=%ct)
+          now=$(date +%s)
+          if [ $((now - last)) -gt 2592000 ]; then
+            git commit --allow-empty -m "Keep scheduled workflow active"
+            git push
+          fi
