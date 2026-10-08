@@ -1,0 +1,9 @@
+{
+  "timezone": "Europe/Kyiv",
+  "language": "ru",
+  "alarm_minutes": [15],
+  "pages": 2,
+  "queues": [
+    { "queue": "3.1", "channel": "cherkasy_blackout_3" }
+  ]
+}
