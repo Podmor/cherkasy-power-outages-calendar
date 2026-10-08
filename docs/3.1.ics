@@ -3,200 +3,200 @@ VERSION:2.0
 PRODID:-//cherkasy-power-outages-calendar//EN
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
-X-WR-CALNAME:Отключения света 3.1 (Черкассы)
-X-WR-CALDESC:Плановые отключения света для оче
- реди 3.1. Источник: https://t.me/cherkasy_blackout_3
+X-WR-CALNAME:Відключення світла 3.1 (Черкаси)
+X-WR-CALDESC:Планові відключення світла для че
+ рги 3.1. Джерело: https://t.me/cherkasy_blackout_3
 X-WR-TIMEZONE:Europe/Kyiv
 REFRESH-INTERVAL;VALUE=DURATION:PT15M
 X-PUBLISHED-TTL:PT15M
 BEGIN:VEVENT
 UID:3.1-20261006T1600@cherkasy-power-outages-calendar
-DTSTAMP:20261008T225904Z
-LAST-MODIFIED:20261008T225904Z
-SEQUENCE:0
+DTSTAMP:20261008T231641Z
+LAST-MODIFIED:20261008T231641Z
+SEQUENCE:1
 DTSTART:20261006T160000Z
 DTEND:20261006T180000Z
-SUMMARY:💡 Света не будет (3.1)
-DESCRIPTION:Плановое отключение света\, очеред
- ь 3.1. График берётся из Telegram-канала @cherkasy_b
- lackout_3.
+SUMMARY:💡 Світла не буде (3.1)
+DESCRIPTION:Планове відключення світла\, черга
+  3.1. Графік береться з Telegram-каналу @cherkasy_bla
+ ckout_3.
 TRANSP:TRANSPARENT
 STATUS:CONFIRMED
 BEGIN:VALARM
 TRIGGER:-PT15M
 ACTION:DISPLAY
-DESCRIPTION:Свет отключат через 15 мин (3.1)
+DESCRIPTION:Світло вимкнуть через 15 хв (3.1)
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
 UID:3.1-20261007T0400@cherkasy-power-outages-calendar
-DTSTAMP:20261008T225904Z
-LAST-MODIFIED:20261008T225904Z
-SEQUENCE:0
+DTSTAMP:20261008T231641Z
+LAST-MODIFIED:20261008T231641Z
+SEQUENCE:1
 DTSTART:20261007T040000Z
 DTEND:20261007T060000Z
-SUMMARY:💡 Света не будет (3.1)
-DESCRIPTION:Плановое отключение света\, очеред
- ь 3.1. График берётся из Telegram-канала @cherkasy_b
- lackout_3.
+SUMMARY:💡 Світла не буде (3.1)
+DESCRIPTION:Планове відключення світла\, черга
+  3.1. Графік береться з Telegram-каналу @cherkasy_bla
+ ckout_3.
 TRANSP:TRANSPARENT
 STATUS:CONFIRMED
 BEGIN:VALARM
 TRIGGER:-PT15M
 ACTION:DISPLAY
-DESCRIPTION:Свет отключат через 15 мин (3.1)
+DESCRIPTION:Світло вимкнуть через 15 хв (3.1)
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
 UID:3.1-20261007T1400@cherkasy-power-outages-calendar
-DTSTAMP:20261008T225904Z
-LAST-MODIFIED:20261008T225904Z
-SEQUENCE:0
+DTSTAMP:20261008T231641Z
+LAST-MODIFIED:20261008T231641Z
+SEQUENCE:1
 DTSTART:20261007T140000Z
 DTEND:20261007T160000Z
-SUMMARY:💡 Света не будет (3.1)
-DESCRIPTION:Плановое отключение света\, очеред
- ь 3.1. График берётся из Telegram-канала @cherkasy_b
- lackout_3.
+SUMMARY:💡 Світла не буде (3.1)
+DESCRIPTION:Планове відключення світла\, черга
+  3.1. Графік береться з Telegram-каналу @cherkasy_bla
+ ckout_3.
 TRANSP:TRANSPARENT
 STATUS:CONFIRMED
 BEGIN:VALARM
 TRIGGER:-PT15M
 ACTION:DISPLAY
-DESCRIPTION:Свет отключат через 15 мин (3.1)
+DESCRIPTION:Світло вимкнуть через 15 хв (3.1)
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
 UID:3.1-20261007T2000@cherkasy-power-outages-calendar
-DTSTAMP:20261008T225904Z
-LAST-MODIFIED:20261008T225904Z
-SEQUENCE:0
+DTSTAMP:20261008T231641Z
+LAST-MODIFIED:20261008T231641Z
+SEQUENCE:1
 DTSTART:20261007T200000Z
 DTEND:20261007T220000Z
-SUMMARY:💡 Света не будет (3.1)
-DESCRIPTION:Плановое отключение света\, очеред
- ь 3.1. График берётся из Telegram-канала @cherkasy_b
- lackout_3.
+SUMMARY:💡 Світла не буде (3.1)
+DESCRIPTION:Планове відключення світла\, черга
+  3.1. Графік береться з Telegram-каналу @cherkasy_bla
+ ckout_3.
 TRANSP:TRANSPARENT
 STATUS:CONFIRMED
 BEGIN:VALARM
 TRIGGER:-PT15M
 ACTION:DISPLAY
-DESCRIPTION:Свет отключат через 15 мин (3.1)
+DESCRIPTION:Світло вимкнуть через 15 хв (3.1)
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
 UID:3.1-20261008T0500@cherkasy-power-outages-calendar
-DTSTAMP:20261008T225904Z
-LAST-MODIFIED:20261008T225904Z
-SEQUENCE:0
+DTSTAMP:20261008T231641Z
+LAST-MODIFIED:20261008T231641Z
+SEQUENCE:1
 DTSTART:20261008T050000Z
 DTEND:20261008T080000Z
-SUMMARY:💡 Света не будет (3.1)
-DESCRIPTION:Плановое отключение света\, очеред
- ь 3.1. График берётся из Telegram-канала @cherkasy_b
- lackout_3.
+SUMMARY:💡 Світла не буде (3.1)
+DESCRIPTION:Планове відключення світла\, черга
+  3.1. Графік береться з Telegram-каналу @cherkasy_bla
+ ckout_3.
 TRANSP:TRANSPARENT
 STATUS:CONFIRMED
 BEGIN:VALARM
 TRIGGER:-PT15M
 ACTION:DISPLAY
-DESCRIPTION:Свет отключат через 15 мин (3.1)
+DESCRIPTION:Світло вимкнуть через 15 хв (3.1)
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
 UID:3.1-20261008T1100@cherkasy-power-outages-calendar
-DTSTAMP:20261008T225904Z
-LAST-MODIFIED:20261008T225904Z
-SEQUENCE:0
+DTSTAMP:20261008T231641Z
+LAST-MODIFIED:20261008T231641Z
+SEQUENCE:1
 DTSTART:20261008T110000Z
 DTEND:20261008T140000Z
-SUMMARY:💡 Света не будет (3.1)
-DESCRIPTION:Плановое отключение света\, очеред
- ь 3.1. График берётся из Telegram-канала @cherkasy_b
- lackout_3.
+SUMMARY:💡 Світла не буде (3.1)
+DESCRIPTION:Планове відключення світла\, черга
+  3.1. Графік береться з Telegram-каналу @cherkasy_bla
+ ckout_3.
 TRANSP:TRANSPARENT
 STATUS:CONFIRMED
 BEGIN:VALARM
 TRIGGER:-PT15M
 ACTION:DISPLAY
-DESCRIPTION:Свет отключат через 15 мин (3.1)
+DESCRIPTION:Світло вимкнуть через 15 хв (3.1)
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
 UID:3.1-20261008T1600@cherkasy-power-outages-calendar
-DTSTAMP:20261008T225904Z
-LAST-MODIFIED:20261008T225904Z
-SEQUENCE:0
+DTSTAMP:20261008T231641Z
+LAST-MODIFIED:20261008T231641Z
+SEQUENCE:1
 DTSTART:20261008T160000Z
 DTEND:20261008T180000Z
-SUMMARY:💡 Света не будет (3.1)
-DESCRIPTION:Плановое отключение света\, очеред
- ь 3.1. График берётся из Telegram-канала @cherkasy_b
- lackout_3.
+SUMMARY:💡 Світла не буде (3.1)
+DESCRIPTION:Планове відключення світла\, черга
+  3.1. Графік береться з Telegram-каналу @cherkasy_bla
+ ckout_3.
 TRANSP:TRANSPARENT
 STATUS:CONFIRMED
 BEGIN:VALARM
 TRIGGER:-PT15M
 ACTION:DISPLAY
-DESCRIPTION:Свет отключат через 15 мин (3.1)
+DESCRIPTION:Світло вимкнуть через 15 хв (3.1)
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
 UID:3.1-20261009T0000@cherkasy-power-outages-calendar
-DTSTAMP:20261008T225904Z
-LAST-MODIFIED:20261008T225904Z
-SEQUENCE:0
+DTSTAMP:20261008T231641Z
+LAST-MODIFIED:20261008T231641Z
+SEQUENCE:1
 DTSTART:20261009T000000Z
 DTEND:20261009T020000Z
-SUMMARY:💡 Света не будет (3.1)
-DESCRIPTION:Плановое отключение света\, очеред
- ь 3.1. График берётся из Telegram-канала @cherkasy_b
- lackout_3.
+SUMMARY:💡 Світла не буде (3.1)
+DESCRIPTION:Планове відключення світла\, черга
+  3.1. Графік береться з Telegram-каналу @cherkasy_bla
+ ckout_3.
 TRANSP:TRANSPARENT
 STATUS:CONFIRMED
 BEGIN:VALARM
 TRIGGER:-PT15M
 ACTION:DISPLAY
-DESCRIPTION:Свет отключат через 15 мин (3.1)
+DESCRIPTION:Світло вимкнуть через 15 хв (3.1)
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
 UID:3.1-20261009T1000@cherkasy-power-outages-calendar
-DTSTAMP:20261008T225904Z
-LAST-MODIFIED:20261008T225904Z
-SEQUENCE:0
+DTSTAMP:20261008T231641Z
+LAST-MODIFIED:20261008T231641Z
+SEQUENCE:1
 DTSTART:20261009T100000Z
 DTEND:20261009T120000Z
-SUMMARY:💡 Света не будет (3.1)
-DESCRIPTION:Плановое отключение света\, очеред
- ь 3.1. График берётся из Telegram-канала @cherkasy_b
- lackout_3.
+SUMMARY:💡 Світла не буде (3.1)
+DESCRIPTION:Планове відключення світла\, черга
+  3.1. Графік береться з Telegram-каналу @cherkasy_bla
+ ckout_3.
 TRANSP:TRANSPARENT
 STATUS:CONFIRMED
 BEGIN:VALARM
 TRIGGER:-PT15M
 ACTION:DISPLAY
-DESCRIPTION:Свет отключат через 15 мин (3.1)
+DESCRIPTION:Світло вимкнуть через 15 хв (3.1)
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
 UID:3.1-20261009T1600@cherkasy-power-outages-calendar
-DTSTAMP:20261008T225904Z
-LAST-MODIFIED:20261008T225904Z
-SEQUENCE:0
+DTSTAMP:20261008T231641Z
+LAST-MODIFIED:20261008T231641Z
+SEQUENCE:1
 DTSTART:20261009T160000Z
 DTEND:20261009T180000Z
-SUMMARY:💡 Света не будет (3.1)
-DESCRIPTION:Плановое отключение света\, очеред
- ь 3.1. График берётся из Telegram-канала @cherkasy_b
- lackout_3.
+SUMMARY:💡 Світла не буде (3.1)
+DESCRIPTION:Планове відключення світла\, черга
+  3.1. Графік береться з Telegram-каналу @cherkasy_bla
+ ckout_3.
 TRANSP:TRANSPARENT
 STATUS:CONFIRMED
 BEGIN:VALARM
 TRIGGER:-PT15M
 ACTION:DISPLAY
-DESCRIPTION:Свет отключат через 15 мин (3.1)
+DESCRIPTION:Світло вимкнуть через 15 хв (3.1)
 END:VALARM
 END:VEVENT
 END:VCALENDAR
