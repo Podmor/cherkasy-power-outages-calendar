@@ -185,3 +185,29 @@ def test_unreadable_newest_image_fails_the_run(tmp_path):
     logs = []
     assert run(root, broken.html, broken.bytes, NOW, logs.append) == 1
     assert any("cannot read the image" in m for m in logs)
+
+
+def test_language_switch_marks_events_as_modified(tmp_path):
+    root = _project(tmp_path)
+    cfg = json.loads((root / "config.json").read_text(encoding="utf-8"))
+    cfg["language"] = "ru"
+    (root / "config.json").write_text(json.dumps(cfg), encoding="utf-8")
+    ch = FakeChannel(POSTS)
+    run(root, ch.html, ch.bytes, NOW, lambda m: None)
+    text, events = _events(root)
+    assert "Света не будет" in text
+    assert {e["SEQUENCE"] for e in events} == {"0"}
+
+    cfg["language"] = "uk"
+    (root / "config.json").write_text(json.dumps(cfg), encoding="utf-8")
+    later = datetime(2026, 10, 8, 19, 0, tzinfo=timezone.utc)
+    run(root, ch.html, ch.bytes, later, lambda m: None)
+    text, events = _events(root)
+    assert "Світла не буде" in text and "Света не будет" not in text
+    assert "Відключення світла 3.1 (Черкаси)" in text
+    assert {e["SEQUENCE"] for e in events} == {"1"}
+
+    # Running again with the same language changes nothing.
+    before = (root / "docs" / "3.1.ics").read_bytes()
+    run(root, ch.html, ch.bytes, later, lambda m: None)
+    assert (root / "docs" / "3.1.ics").read_bytes() == before

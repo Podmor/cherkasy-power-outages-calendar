@@ -21,6 +21,7 @@ from .schedule import (
     prune_days,
     save_state,
     sync_events,
+    sync_language,
 )
 from .telegram import Post, fetch_posts, http_get, parse_caption_date, parse_notice
 from .wheel import WheelError, parse_wheel
@@ -106,10 +107,14 @@ def run_queue(root: Path, cfg: dict, qcfg: dict, fetch_html, fetch_bytes, now: d
     prune_days(state, now.astimezone(tz).date())
 
     intervals = build_intervals(state["days"], tz)
+    language = cfg.get("language", "uk")
+    # Must run before sync_events: it looks at the events of the previous run.
+    if sync_language(state, language, now):
+        log(f"[{queue}] language changed to '{language}', all events marked as modified")
     sync_events(state, intervals, now)
     crosscheck(posts, intervals, state["days"], tz, log)
 
-    ics_text = build_ics(queue, channel, state["events"], cfg.get("language", "ru"), cfg.get("alarm_minutes", [15]))
+    ics_text = build_ics(queue, channel, state["events"], language, cfg.get("alarm_minutes", [15]))
     ics_path.parent.mkdir(parents=True, exist_ok=True)
     ics_path.write_bytes(ics_text.encode("utf-8"))
     save_state(state_path, state)

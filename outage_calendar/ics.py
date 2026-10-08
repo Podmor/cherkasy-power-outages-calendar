@@ -47,7 +47,7 @@ def _fold(line: str) -> list[str]:
 
 
 def build_ics(queue: str, channel: str, events: dict[str, dict], language: str, alarm_minutes: list[int]) -> str:
-    t = TEXTS.get(language, TEXTS["ru"])
+    t = TEXTS.get(language, TEXTS["uk"])
     lines = [
         "BEGIN:VCALENDAR",
         "VERSION:2.0",

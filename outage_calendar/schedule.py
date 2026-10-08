@@ -78,6 +78,24 @@ def sync_events(state: dict, intervals: list[Interval], now: datetime) -> bool:
     return changed
 
 
+def sync_language(state: dict, language: str, now: datetime) -> bool:
+    """When the calendar language changes, mark every event as modified.
+
+    Calendar apps only re-read an event when its SEQUENCE / LAST-MODIFIED grows, so without
+    this the old texts could stay on the phone. State files written before this field existed
+    were always generated in Russian.
+    """
+    previous = state.get("language", "ru" if state.get("events") else language)
+    state["language"] = language
+    if previous == language:
+        return False
+    stamp = now.strftime("%Y%m%dT%H%M%SZ")
+    for ev in state.get("events", {}).values():
+        ev["seq"] += 1
+        ev["modified"] = stamp
+    return True
+
+
 def local_runs(intervals: list[Interval], tz: ZoneInfo) -> tuple[set[datetime], set[datetime]]:
     """Naive local start and end times of all intervals (used for sanity checks)."""
     starts = {iv.start.astimezone(tz).replace(tzinfo=None) for iv in intervals}
