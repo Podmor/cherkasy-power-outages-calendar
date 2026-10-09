@@ -10,6 +10,10 @@ from zoneinfo import ZoneInfo
 
 KEEP_DAYS = 30
 
+# Bump when the way "days" are read from the channel changes: old days are then dropped
+# and read again from the posts, while the events (with their SEQUENCE numbers) are kept.
+SOURCE = "pat_cherkasyoblenergo/text-v1"
+
 
 @dataclass(frozen=True)
 class Interval:
@@ -22,9 +26,14 @@ class Interval:
 
 
 def load_state(path: Path, queue: str) -> dict:
+    state = {"queue": queue, "source": SOURCE, "days": {}, "events": {}, "fingerprint": None}
     if path.exists():
-        return json.loads(path.read_text(encoding="utf-8"))
-    return {"queue": queue, "days": {}, "events": {}}
+        old = json.loads(path.read_text(encoding="utf-8"))
+        state["events"] = old.get("events", {})
+        state["fingerprint"] = old.get("fingerprint")
+        if old.get("source") == SOURCE:
+            state["days"] = old.get("days", {})
+    return state
 
 
 def save_state(path: Path, state: dict) -> None:
@@ -37,6 +46,31 @@ def prune_days(state: dict, today: date) -> None:
     for key in list(state["days"]):
         if date.fromisoformat(key) < limit:
             del state["days"][key]
+
+
+def apply_post(state: dict, day: str, hours: list[int], post_id: int, posted_at: datetime, tz: ZoneInfo) -> bool:
+    """Merge one schedule post into state['days'][day]. Returns True when it was applied.
+
+    A post published during the day lists only the hours that are still ahead (the outage
+    running at that moment is listed whole), so everything before the first listed hour
+    or before the current hour - whichever is earlier - is kept from the earlier posts.
+    A post published before the day starts replaces the whole day.
+    """
+    known = state["days"].get(day)
+    if known and known["post"] >= post_id:
+        return False
+    d = date.fromisoformat(day)
+    day_start = datetime(d.year, d.month, d.day, tzinfo=tz)
+    elapsed = int((posted_at - day_start).total_seconds() // 3600)
+    elapsed = max(0, min(24, elapsed))
+    cut = min(elapsed, min(hours)) if hours else elapsed
+    kept = [h for h in (known["hours"] if known else []) if h < cut]
+    state["days"][day] = {
+        "hours": sorted(set(kept) | set(hours)),
+        "post": post_id,
+        "posted_at": posted_at.isoformat(),
+    }
+    return True
 
 
 def build_intervals(days: dict, tz: ZoneInfo) -> list[Interval]:
@@ -58,6 +92,24 @@ def build_intervals(days: dict, tz: ZoneInfo) -> list[Interval]:
     return intervals
 
 
+def sync_texts(state: dict, fingerprint: str, now: datetime) -> bool:
+    """When the texts of the calendar change, mark every event as modified.
+
+    Calendar apps only re-read an event when its SEQUENCE / LAST-MODIFIED grows, so without
+    this the old texts could stay on the phone. A queue that has no events yet (first run)
+    has nothing to mark.
+    """
+    previous = state.get("fingerprint")
+    state["fingerprint"] = fingerprint
+    if previous == fingerprint or (previous is None and not state["events"]):
+        return False
+    stamp = now.strftime("%Y%m%dT%H%M%SZ")
+    for ev in state["events"].values():
+        ev["seq"] += 1
+        ev["modified"] = stamp
+    return True
+
+
 def sync_events(state: dict, intervals: list[Interval], now: datetime) -> bool:
     """Update state['events'] to match intervals. Returns True when anything changed."""
     old = state.get("events", {})
@@ -76,28 +128,3 @@ def sync_events(state: dict, intervals: list[Interval], now: datetime) -> bool:
     changed = new != old
     state["events"] = new
     return changed
-
-
-def sync_language(state: dict, language: str, now: datetime) -> bool:
-    """When the calendar language changes, mark every event as modified.
-
-    Calendar apps only re-read an event when its SEQUENCE / LAST-MODIFIED grows, so without
-    this the old texts could stay on the phone. State files written before this field existed
-    were always generated in Russian.
-    """
-    previous = state.get("language", "ru" if state.get("events") else language)
-    state["language"] = language
-    if previous == language:
-        return False
-    stamp = now.strftime("%Y%m%dT%H%M%SZ")
-    for ev in state.get("events", {}).values():
-        ev["seq"] += 1
-        ev["modified"] = stamp
-    return True
-
-
-def local_runs(intervals: list[Interval], tz: ZoneInfo) -> tuple[set[datetime], set[datetime]]:
-    """Naive local start and end times of all intervals (used for sanity checks)."""
-    starts = {iv.start.astimezone(tz).replace(tzinfo=None) for iv in intervals}
-    ends = {iv.end.astimezone(tz).replace(tzinfo=None) for iv in intervals}
-    return starts, ends

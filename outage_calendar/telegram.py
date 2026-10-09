@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 import urllib.request
 from dataclasses import dataclass
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 from zoneinfo import ZoneInfo
 
 from bs4 import BeautifulSoup
@@ -92,22 +92,3 @@ def parse_caption_date(text: str, posted_at: datetime, tz: ZoneInfo) -> date | N
     if best is None or abs((best - local).days) > 90:
         return None
     return best
-
-
-_ON_RE = re.compile(r"увімкнуть\s+в\s+(\d{1,2}):(\d{2})", re.IGNORECASE)
-_NEXT_RE = re.compile(r"Наступне\s+відключення\s+енергоживлення\s+в\s+(\d{1,2}):(\d{2})", re.IGNORECASE)
-
-
-def parse_notice(text: str, posted_at: datetime, tz: ZoneInfo) -> tuple[str, datetime] | None:
-    """Bot notices like 'Енергоживлення увімкнуть в 09:00' -> ('on', local datetime)."""
-    for kind, rx in (("on", _ON_RE), ("off", _NEXT_RE)):
-        m = rx.search(text)
-        if not m:
-            continue
-        hh, mm = int(m.group(1)), int(m.group(2))
-        local = posted_at.astimezone(tz)
-        target = datetime(local.year, local.month, local.day, tzinfo=tz) + timedelta(hours=hh, minutes=mm)
-        if target < local - timedelta(minutes=30):
-            target += timedelta(days=1)
-        return kind, target.replace(tzinfo=None)
-    return None

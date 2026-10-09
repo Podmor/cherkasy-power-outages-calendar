@@ -2,23 +2,15 @@
 
 from __future__ import annotations
 
+import hashlib
 from datetime import datetime
 
 TEXTS = {
-    "ru": {
-        "summary": "💡 Света не будет ({queue})",
-        "description": "Плановое отключение света, очередь {queue}. График берётся из Telegram-канала @{channel}.",
-        "alarm": "Свет отключат через {minutes} мин ({queue})",
-        "calname": "Отключения света {queue} (Черкассы)",
-        "caldesc": "Плановые отключения света для очереди {queue}. Источник: https://t.me/{channel}",
-    },
-    "uk": {
-        "summary": "💡 Світла не буде ({queue})",
-        "description": "Планове відключення світла, черга {queue}. Графік береться з Telegram-каналу @{channel}.",
-        "alarm": "Світло вимкнуть через {minutes} хв ({queue})",
-        "calname": "Відключення світла {queue} (Черкаси)",
-        "caldesc": "Планові відключення світла для черги {queue}. Джерело: https://t.me/{channel}",
-    },
+    "summary": "💡 Світла не буде ({queue})",
+    "description": "Планове відключення світла, черга {queue}. Дані з офіційного Telegram-каналу @{channel}.",
+    "alarm": "Світло вимкнуть через {minutes} хв ({queue})",
+    "calname": "Відключення світла {queue} (Черкаси)",
+    "caldesc": "Планові відключення світла для черги {queue}. Джерело: https://t.me/{channel}",
 }
 
 
@@ -46,8 +38,15 @@ def _fold(line: str) -> list[str]:
     return [parts[0]] + [" " + p for p in parts[1:]]
 
 
-def build_ics(queue: str, channel: str, events: dict[str, dict], language: str, alarm_minutes: list[int]) -> str:
-    t = TEXTS.get(language, TEXTS["uk"])
+def text_fingerprint(queue: str, channel: str, alarm_minutes: list[int]) -> str:
+    """Changes whenever any text that ends up in the calendar changes."""
+    parts = [t.format(queue=queue, channel=channel, minutes=0) for t in TEXTS.values()]
+    parts.append(",".join(str(m) for m in alarm_minutes))
+    return hashlib.sha1("\n".join(parts).encode("utf-8")).hexdigest()[:12]
+
+
+def build_ics(queue: str, channel: str, events: dict[str, dict], alarm_minutes: list[int]) -> str:
+    t = TEXTS
     lines = [
         "BEGIN:VCALENDAR",
         "VERSION:2.0",

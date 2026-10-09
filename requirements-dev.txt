@@ -1,0 +1,3 @@
+-r requirements.txt
+pillow>=10
+pytest

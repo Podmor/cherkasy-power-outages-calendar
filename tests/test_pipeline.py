@@ -1,92 +1,38 @@
-"""End-to-end run against a fake channel built from real posts of @cherkasy_blackout_3."""
+"""End-to-end runs against a fake channel built from real posts of @pat_cherkasyoblenergo."""
 
-import io
 import json
+import re
 import shutil
 from datetime import datetime, timezone
 from pathlib import Path
 
+from outage_calendar import ics
 from outage_calendar.main import run
 
-from .render import render_wheel
+from .official_fixture import FakeChannel, HEAD_UPD_9, POSTS, post_html
 
-CAPTION_DAILY_8 = "За розпорядженням НЕК «Укренерго» 8 жовтня з 00:00 до 24:00 у Черкаській області будуть застосовані графіки погодинних відключень (ГПВ)."
-CAPTION_DAILY_9 = "Через постійні ворожі обстріли та наслідки попередніх ракетно-дронових атак за розпорядженням НЕК «Укренерго» 9 жовтня з 00:00 до 24:00 у Черкаській області будуть застосовані графіки погодинних відключень (ГПВ)."
-
-
-def _full(hours):
-    return {"hours": hours}
-
-
-def _changes(final, added=(), cancelled=()):
-    return {"hours": final, "kind": "changes", "added": added, "cancelled": cancelled}
-
-
-# (id, UTC time, text, image spec or None) - ids, times and texts are the real ones.
-POSTS = [
-    (2408, "2026-10-07T04:05:00", "Енергоживлення увімкнуть в 09:00", None),
-    (2409, "2026-10-07T06:05:00", "Наступне відключення енергоживлення в 17:00", None),
-    (2411, "2026-10-07T14:05:00", "Енергоживлення увімкнуть в 19:00", None),
-    (2412, "2026-10-07T16:16:11", CAPTION_DAILY_8, _full([9, 10, 15, 16])),
-    (2413, "2026-10-07T17:57:03", "Оновлений графік погодинних відключень (ГПВ) на 7 жовтня.", _changes([7, 8, 17, 18, 23], [23], [21, 22])),
-    (2414, "2026-10-07T19:50:00", "До відключення енергоживлення залишилось 10 хвилин!", None),
-    (2415, "2026-10-07T20:05:00", "Енергоживлення увімкнуть в 24:00", None),
-    (2416, "2026-10-07T20:53:05", "Оновлений графік погодинних відключень (ГПВ) на 8 жовтня.", _full([0, 9, 10, 15, 16, 19, 20])),
-    (2417, "2026-10-07T22:05:00", "Наступне відключення енергоживлення в 09:00", None),
-    (2418, "2026-10-08T04:57:03", "Оновлений графік погодинних відключень (ГПВ) на 8 жовтня.", _full([0, 8, 9, 10, 14, 15, 16, 19, 20])),
-    (2419, "2026-10-08T05:05:00", "Енергоживлення увімкнуть в 11:00", None),
-    (2420, "2026-10-08T08:05:02", "Наступне відключення енергоживлення в 14:00", None),
-    (2421, "2026-10-08T10:50:01", "До відключення енергоживлення залишилось 10 хвилин!", None),
-    (2422, "2026-10-08T11:05:01", "Енергоживлення увімкнуть в 17:00", None),
-    (2423, "2026-10-08T14:05:01", "Наступне відключення енергоживлення в 19:00", None),
-    (2424, "2026-10-08T15:50:01", "До відключення енергоживлення залишилось 10 хвилин!", None),
-    (2425, "2026-10-08T16:05:02", "Енергоживлення увімкнуть в 21:00", None),
-    (2426, "2026-10-08T18:25:06", CAPTION_DAILY_9, _full([3, 4, 13, 14, 19, 20])),
-]
-
-
-class FakeChannel:
-    def __init__(self, posts):
-        self.posts = list(posts)
-        self.image_downloads = 0
-
-    def photo_url(self, post_id):
-        return f"https://cdn4.telesco.pe/file/photo-{post_id}.jpg"
-
-    def html(self, url):
-        if "before=" in url:
-            return b"<html></html>"
-        parts = []
-        for pid, when, text, spec in self.posts:
-            photo = ""
-            if spec:
-                photo = f'<a class="tgme_widget_message_photo_wrap" style="width:800px;background-image:url(\'{self.photo_url(pid)}\')"></a>'
-            parts.append(
-                f'<div class="tgme_widget_message_wrap"><div class="tgme_widget_message js-widget_message" data-post="cherkasy_blackout_3/{pid}">'
-                f'{photo}<div class="tgme_widget_message_text js-message_text">{text}</div>'
-                f'<a class="tgme_widget_message_date"><time datetime="{when}+00:00" class="time">x</time></a></div></div>'
-            )
-        return ("<html><body>" + "".join(parts) + "</body></html>").encode()
-
-    def bytes(self, url):
-        self.image_downloads += 1
-        pid = int(url.rsplit("photo-", 1)[1].split(".")[0])
-        spec = next(s for p, _, _, s in self.posts if p == pid)
-        img = render_wheel(spec["hours"], kind=spec.get("kind", "full"), added=spec.get("added", ()), cancelled=spec.get("cancelled", ()))
-        buf = io.BytesIO()
-        img.save(buf, "PNG")
-        return buf.getvalue()
+NOW = datetime(2026, 10, 8, 22, 30, tzinfo=timezone.utc)
+ROOT = Path(__file__).parent.parent
+QUEUES = ["1.1", "1.2", "2.1", "2.2", "3.1", "3.2", "4.1", "4.2", "5.1", "5.2", "6.1", "6.2"]
 
 
 def _project(tmp_path: Path) -> Path:
     root = tmp_path / "proj"
     root.mkdir()
-    shutil.copy(Path(__file__).parent.parent / "config.json", root / "config.json")
+    shutil.copy(ROOT / "config.json", root / "config.json")
     return root
 
 
-def _events(root):
-    text = (root / "docs" / "3.1.ics").read_bytes().decode("utf-8")
+def _state(root, queue):
+    return json.loads((root / "state" / f"{queue}.json").read_text(encoding="utf-8"))
+
+
+def _days(root, queue):
+    return {k: v["hours"] for k, v in _state(root, queue)["days"].items()}
+
+
+def _events(root, queue="3.1"):
+    text = (root / "docs" / f"{queue}.ics").read_bytes().decode("utf-8")
     events, cur = [], None
     for line in text.replace("\r\n ", "").split("\r\n"):
         if line == "BEGIN:VEVENT":
@@ -100,26 +46,47 @@ def _events(root):
     return text, events
 
 
-NOW = datetime(2026, 10, 8, 18, 30, tzinfo=timezone.utc)
+def test_config_lists_the_twelve_subqueues():
+    cfg = json.loads((ROOT / "config.json").read_text(encoding="utf-8"))
+    assert cfg["queues"] == QUEUES
 
 
 def test_full_run_on_real_posts(tmp_path):
     root = _project(tmp_path)
-    ch = FakeChannel(POSTS)
+    ch = FakeChannel()
     logs = []
-    assert run(root, ch.html, ch.bytes, NOW, logs.append) == 0
-    assert not [m for m in logs if m.startswith("warning")], logs
+    assert run(root, ch.html, NOW, logs.append) == 0
+    assert not [m for m in logs if "cannot read" in m], logs
 
-    state = json.loads((root / "state" / "3.1.json").read_text(encoding="utf-8"))
-    assert state["days"]["2026-10-07"]["hours"] == [7, 8, 17, 18, 23]
-    assert state["days"]["2026-10-08"]["hours"] == [0, 8, 9, 10, 14, 15, 16, 19, 20]  # latest update wins
-    assert state["days"]["2026-10-08"]["post"] == 2418
-    assert state["days"]["2026-10-09"]["hours"] == [3, 4, 13, 14, 19, 20]
+    # 3.1: exactly what was read earlier from the pictures of @cherkasy_blackout_3.
+    assert _days(root, "3.1") == {
+        "2026-10-06": [19, 20],
+        "2026-10-07": [7, 8, 17, 18, 23],  # evening update adds 23, keeps the morning and afternoon outages
+        "2026-10-08": [0, 8, 9, 10, 14, 15, 16, 19, 20],  # two partial updates merged into the day
+        "2026-10-09": [3, 4, 13, 14, 19, 20],
+    }
+    # Other subqueues, including ones that have no picture channel.
+    assert _days(root, "5.2")["2026-10-08"] == [3, 4, 9, 10, 13, 14, 15, 19, 20, 23]
+    assert _days(root, "6.1")["2026-10-09"] == [6, 7, 14, 15, 20, 21]  # update after midnight replaces the day
+    assert _days(root, "6.1")["2026-10-06"] == [18, 19]  # appears only in the 14:48 update
+    assert _days(root, "1.1")["2026-10-06"] == [15, 16, 22, 23]
 
+    for q in QUEUES:
+        assert (root / "docs" / f"{q}.ics").exists()
+    page = (root / "docs" / "index.html").read_text(encoding="utf-8")
+    for q in QUEUES:
+        assert f"webcal://podmor.github.io/cherkasy-power-outages-calendar/{q}.ics" in page
+        assert f"calendar.google.com/calendar/r?cid=webcal%3A%2F%2Fpodmor.github.io%2Fcherkasy-power-outages-calendar%2F{q}.ics" in page
+
+
+def test_ics_of_queue_3_1(tmp_path):
+    root = _project(tmp_path)
+    run(root, FakeChannel().html, NOW, lambda m: None)
     text, events = _events(root)
     # Kyiv is UTC+3 in October (summer time until 25 Oct), so 07:00 Kyiv = 04:00 UTC.
     spans = [(e["DTSTART"], e["DTEND"]) for e in events]
     assert spans == [
+        ("20261006T160000Z", "20261006T180000Z"),  # 19-21 on the 6th
         ("20261007T040000Z", "20261007T060000Z"),  # 07-09
         ("20261007T140000Z", "20261007T160000Z"),  # 17-19
         ("20261007T200000Z", "20261007T220000Z"),  # 23:00 on 7th - 01:00 on 8th, merged across midnight
@@ -130,84 +97,116 @@ def test_full_run_on_real_posts(tmp_path):
         ("20261009T100000Z", "20261009T120000Z"),  # 13-15
         ("20261009T160000Z", "20261009T180000Z"),  # 19-21
     ]
+    assert "X-WR-CALNAME:Відключення світла 3.1 (Черкаси)" in text
+    assert events[0]["SUMMARY"] == "💡 Світла не буде (3.1)"
     assert "TRIGGER:-PT15M" in text
     assert all(len(line.encode("utf-8")) <= 75 for line in text.replace("\r\n", "\n").split("\n"))
     assert text.endswith("\r\n")
 
 
-def test_second_run_changes_nothing_and_downloads_nothing(tmp_path):
+def test_output_uses_only_ukrainian_letters(tmp_path):
     root = _project(tmp_path)
-    ch = FakeChannel(POSTS)
-    run(root, ch.html, ch.bytes, NOW, lambda m: None)
-    first = ((root / "docs" / "3.1.ics").read_bytes(), (root / "state" / "3.1.json").read_bytes())
-    downloads = ch.image_downloads
+    run(root, FakeChannel().html, NOW, lambda m: None)
+    for path in list((root / "docs").iterdir()) + list((root / "state").iterdir()):
+        text = path.read_bytes().decode("utf-8")
+        assert not re.search("[ыэъёЫЭЪЁ]", text), path
 
-    later = datetime(2026, 10, 8, 19, 0, tzinfo=timezone.utc)
-    run(root, ch.html, ch.bytes, later, lambda m: None)
-    assert ch.image_downloads == downloads
-    assert ((root / "docs" / "3.1.ics").read_bytes(), (root / "state" / "3.1.json").read_bytes()) == first
+
+def test_second_run_changes_nothing(tmp_path):
+    root = _project(tmp_path)
+    ch = FakeChannel()
+    run(root, ch.html, NOW, lambda m: None)
+    first = {p.name: p.read_bytes() for d in ("docs", "state") for p in (root / d).iterdir()}
+    run(root, ch.html, datetime(2026, 10, 8, 23, 0, tzinfo=timezone.utc), lambda m: None)
+    second = {p.name: p.read_bytes() for d in ("docs", "state") for p in (root / d).iterdir()}
+    assert first == second
 
 
 def test_schedule_update_edits_and_removes_events(tmp_path):
     root = _project(tmp_path)
-    ch = FakeChannel(POSTS)
-    run(root, ch.html, ch.bytes, NOW, lambda m: None)
+    ch = FakeChannel()
+    run(root, ch.html, NOW, lambda m: None)
 
-    # A new image for 9 Oct: 03-05 is cancelled, 13-15 is extended to 13-16, 19-21 stays, 22-23 is added.
-    update = (2427, "2026-10-09T05:00:00", "Оновлений графік погодинних відключень (ГПВ) на 9 жовтня.",
-              _changes([13, 14, 15, 19, 20, 22], added=[15, 22], cancelled=[3, 4]))
+    # 9 Oct, 08:05 Kyiv: 03-05 has passed, 13-15 is extended to 13-16, 19-21 stays, 22-23 is added.
+    update = (1808, "2026-10-09T05:05:00", HEAD_UPD_9, [
+        "3.1 13:00 - 16:00, 19:00 - 21:00, 22:00 - 23:00",
+    ])
     ch.posts.append(update)
-    later = datetime(2026, 10, 9, 5, 5, tzinfo=timezone.utc)
-    assert run(root, ch.html, ch.bytes, later, lambda m: None) == 0
+    assert run(root, ch.html, datetime(2026, 10, 9, 5, 10, tzinfo=timezone.utc), lambda m: None) == 0
 
+    assert _days(root, "3.1")["2026-10-09"] == [3, 4, 13, 14, 15, 19, 20, 22]  # 03-05 already happened: kept
     _, events = _events(root)
     spans = {e["DTSTART"]: e for e in events}
-    assert "20261009T000000Z" not in spans  # cancelled outage disappeared
     assert spans["20261009T100000Z"]["DTEND"] == "20261009T130000Z"  # extended to 16:00 Kyiv
     assert spans["20261009T100000Z"]["SEQUENCE"] == "1"
     assert spans["20261009T160000Z"]["SEQUENCE"] == "0"  # untouched
     assert spans["20261009T190000Z"]["DTEND"] == "20261009T200000Z"  # new outage 22:00-23:00 Kyiv
     assert spans["20261009T190000Z"]["SEQUENCE"] == "0"
 
+    # An update that cancels the rest of the day: nothing is listed for 3.1 any more.
+    ch.posts.append((1809, "2026-10-09T10:00:00", HEAD_UPD_9, ["1.1 20:00 - 21:00"]))
+    run(root, ch.html, datetime(2026, 10, 9, 10, 5, tzinfo=timezone.utc), lambda m: None)
+    assert _days(root, "3.1")["2026-10-09"] == [3, 4]  # at 13:00 Kyiv only the morning outage is left
+    _, events = _events(root)
+    assert "20261009T100000Z" not in {e["DTSTART"] for e in events}
 
-def test_unreadable_newest_image_fails_the_run(tmp_path):
+
+def test_unreadable_newest_post_fails_the_run(tmp_path):
     root = _project(tmp_path)
-    ch = FakeChannel(POSTS)
-
-    class Broken(FakeChannel):
-        def bytes(self, url):
-            from PIL import Image
-            buf = io.BytesIO()
-            Image.new("RGB", (800, 800), "white").save(buf, "PNG")
-            return buf.getvalue()
-
-    broken = Broken(POSTS)
+    ch = FakeChannel(POSTS + [(1810, "2026-10-09T10:00:00", HEAD_UPD_9, ["3.1 14:30 - 16:00"])])
     logs = []
-    assert run(root, broken.html, broken.bytes, NOW, logs.append) == 1
-    assert any("cannot read the image" in m for m in logs)
+    assert run(root, ch.html, NOW, logs.append) == 1
+    assert any("post 1810" in m for m in logs)
+    # The older posts were still applied.
+    assert _days(root, "3.1")["2026-10-09"] == [3, 4, 13, 14, 19, 20]
 
 
-def test_language_switch_marks_events_as_modified(tmp_path):
+def test_unreadable_old_post_does_not_fail_forever(tmp_path):
     root = _project(tmp_path)
-    cfg = json.loads((root / "config.json").read_text(encoding="utf-8"))
-    cfg["language"] = "ru"
-    (root / "config.json").write_text(json.dumps(cfg), encoding="utf-8")
-    ch = FakeChannel(POSTS)
-    run(root, ch.html, ch.bytes, NOW, lambda m: None)
-    text, events = _events(root)
-    assert "Света не будет" in text
-    assert {e["SEQUENCE"] for e in events} == {"0"}
+    broken = (1793, "2026-10-06T15:00:00", "Оновлений графік (ГПВ) на 6 жовтня. ", ["1.1 14:30 - 16:00"])
+    ch = FakeChannel(POSTS + [broken])
+    assert run(root, ch.html, NOW, lambda m: None) == 0
 
-    cfg["language"] = "uk"
-    (root / "config.json").write_text(json.dumps(cfg), encoding="utf-8")
-    later = datetime(2026, 10, 8, 19, 0, tzinfo=timezone.utc)
-    run(root, ch.html, ch.bytes, later, lambda m: None)
+
+def test_changed_texts_mark_events_as_modified(tmp_path, monkeypatch):
+    root = _project(tmp_path)
+    ch = FakeChannel()
+    run(root, ch.html, NOW, lambda m: None)
+    assert {e["SEQUENCE"] for e in _events(root)[1]} == {"0"}
+
+    monkeypatch.setitem(ics.TEXTS, "summary", "💡 Світла не буде! ({queue})")
+    later = datetime(2026, 10, 8, 23, 0, tzinfo=timezone.utc)
+    run(root, ch.html, later, lambda m: None)
     text, events = _events(root)
-    assert "Світла не буде" in text and "Света не будет" not in text
-    assert "Відключення світла 3.1 (Черкаси)" in text
+    assert "Світла не буде! (3.1)" in text
     assert {e["SEQUENCE"] for e in events} == {"1"}
+    assert {e["LAST-MODIFIED"] for e in events} == {"20261008T230000Z"}
 
-    # Running again with the same language changes nothing.
     before = (root / "docs" / "3.1.ics").read_bytes()
-    run(root, ch.html, ch.bytes, later, lambda m: None)
+    run(root, ch.html, datetime(2026, 10, 8, 23, 15, tzinfo=timezone.utc), lambda m: None)
     assert (root / "docs" / "3.1.ics").read_bytes() == before
+
+
+def test_state_from_the_picture_channel_is_migrated(tmp_path):
+    """The live calendar of queue 3.1 was built from pictures: its events keep their numbers."""
+    root = _project(tmp_path)
+    (root / "state").mkdir()
+    old_state = {
+        "queue": "3.1",
+        "language": "uk",
+        "days": {"2026-10-09": {"hours": [1], "post": 99999, "photo": "x", "posted_at": "2026-10-08T18:25:06+00:00"}},
+        "events": {
+            "20261009T0000": {"end": "20261009T020000Z", "seq": 1, "modified": "20261008T231641Z"},
+            "20261009T1000": {"end": "20261009T120000Z", "seq": 1, "modified": "20261008T231641Z"},
+            "20261009T1600": {"end": "20261009T180000Z", "seq": 1, "modified": "20261008T231641Z"},
+        },
+    }
+    (root / "state" / "3.1.json").write_text(json.dumps(old_state), encoding="utf-8")
+    run(root, FakeChannel().html, NOW, lambda m: None)
+
+    assert _days(root, "3.1")["2026-10-09"] == [3, 4, 13, 14, 19, 20]  # the stale day is replaced by the channel's data
+    _, events = _events(root)
+    spans = {e["DTSTART"]: e for e in events}
+    assert spans["20261009T000000Z"]["SEQUENCE"] == "2"  # same time as before, only the texts changed
+    assert spans["20261009T100000Z"]["SEQUENCE"] == "2"
+    assert "language" not in _state(root, "3.1")

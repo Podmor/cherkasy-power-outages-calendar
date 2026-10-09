@@ -29,7 +29,7 @@ jobs:
       - run: pip install -r requirements.txt
 
       # Reads the Telegram channels, updates state/ and docs/*.ics.
-      # Exits with an error (GitHub then emails the owner) when the newest schedule image cannot be read.
+      # Exits with an error (GitHub then emails the owner) when the newest schedule post cannot be read.
       - name: Update calendar
         run: python -m outage_calendar
 
