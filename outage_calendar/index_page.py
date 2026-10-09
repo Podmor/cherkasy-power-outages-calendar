@@ -13,7 +13,7 @@ def _rows(site_url: str, queues: list[str]) -> str:
         webcal = f"webcal://{host}/{q}.ics"
         google = "https://calendar.google.com/calendar/r?cid=" + quote(webcal, safe="")
         rows.append(
-            f'<tr><th scope="row">{escape(q)}</th>'
+            f'<tr id="q{escape(q)}"><th scope="row">{escape(q)}</th>'
             f'<td><a class="btn" href="{escape(webcal)}">Apple</a></td>'
             f'<td><a class="btn" href="{escape(google)}">Google</a></td>'
             f'<td><a href="{escape(site_url.rstrip("/"))}/{escape(q)}.ics">.ics</a></td></tr>'
@@ -44,6 +44,7 @@ td:last-child {{ text-align: right; font-size: .9rem; }}
 a {{ color: var(--accent); }}
 .btn {{ display: inline-block; padding: 6px 14px; border-radius: 8px; background: var(--accent); color: var(--accent-fg); text-decoration: none; font-weight: 600; }}
 small {{ color: var(--muted); }}
+tr:target th, tr:target td {{ background: var(--line); }}
 </style>
 </head>
 <body>
