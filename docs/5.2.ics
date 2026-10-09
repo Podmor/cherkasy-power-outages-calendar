@@ -3,200 +3,200 @@ VERSION:2.0
 PRODID:-//cherkasy-power-outages-calendar//EN
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
-X-WR-CALNAME:Відключення світла 3.1 (Черкаси)
+X-WR-CALNAME:Відключення світла 5.2 (Черкаси)
 X-WR-CALDESC:Планові відключення світла для че
- рги 3.1. Джерело: https://t.me/pat_cherkasyoblenergo
+ рги 5.2. Джерело: https://t.me/pat_cherkasyoblenergo
 X-WR-TIMEZONE:Europe/Kyiv
 REFRESH-INTERVAL;VALUE=DURATION:PT15M
 X-PUBLISHED-TTL:PT15M
 BEGIN:VEVENT
-UID:3.1-20261006T1600@cherkasy-power-outages-calendar
+UID:5.2-20261006T2000@cherkasy-power-outages-calendar
 DTSTAMP:20261009T000040Z
 LAST-MODIFIED:20261009T000040Z
-SEQUENCE:2
-DTSTART:20261006T160000Z
-DTEND:20261006T180000Z
-SUMMARY:💡 Світла не буде (3.1)
+SEQUENCE:0
+DTSTART:20261006T200000Z
+DTEND:20261006T210000Z
+SUMMARY:💡 Світла не буде (5.2)
 DESCRIPTION:Планове відключення світла\, черга
-  3.1. Дані з офіційного Telegram-каналу @pat_cherkasy
+  5.2. Дані з офіційного Telegram-каналу @pat_cherkasy
  oblenergo.
 TRANSP:TRANSPARENT
 STATUS:CONFIRMED
 BEGIN:VALARM
 TRIGGER:-PT15M
 ACTION:DISPLAY
-DESCRIPTION:Світло вимкнуть через 15 хв (3.1)
+DESCRIPTION:Світло вимкнуть через 15 хв (5.2)
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:3.1-20261007T0400@cherkasy-power-outages-calendar
+UID:5.2-20261007T0800@cherkasy-power-outages-calendar
 DTSTAMP:20261009T000040Z
 LAST-MODIFIED:20261009T000040Z
-SEQUENCE:2
-DTSTART:20261007T040000Z
-DTEND:20261007T060000Z
-SUMMARY:💡 Світла не буде (3.1)
+SEQUENCE:0
+DTSTART:20261007T080000Z
+DTEND:20261007T100000Z
+SUMMARY:💡 Світла не буде (5.2)
 DESCRIPTION:Планове відключення світла\, черга
-  3.1. Дані з офіційного Telegram-каналу @pat_cherkasy
+  5.2. Дані з офіційного Telegram-каналу @pat_cherkasy
  oblenergo.
 TRANSP:TRANSPARENT
 STATUS:CONFIRMED
 BEGIN:VALARM
 TRIGGER:-PT15M
 ACTION:DISPLAY
-DESCRIPTION:Світло вимкнуть через 15 хв (3.1)
+DESCRIPTION:Світло вимкнуть через 15 хв (5.2)
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:3.1-20261007T1400@cherkasy-power-outages-calendar
+UID:5.2-20261007T1800@cherkasy-power-outages-calendar
 DTSTAMP:20261009T000040Z
 LAST-MODIFIED:20261009T000040Z
-SEQUENCE:2
-DTSTART:20261007T140000Z
-DTEND:20261007T160000Z
-SUMMARY:💡 Світла не буде (3.1)
+SEQUENCE:0
+DTSTART:20261007T180000Z
+DTEND:20261007T200000Z
+SUMMARY:💡 Світла не буде (5.2)
 DESCRIPTION:Планове відключення світла\, черга
-  3.1. Дані з офіційного Telegram-каналу @pat_cherkasy
+  5.2. Дані з офіційного Telegram-каналу @pat_cherkasy
  oblenergo.
 TRANSP:TRANSPARENT
 STATUS:CONFIRMED
 BEGIN:VALARM
 TRIGGER:-PT15M
 ACTION:DISPLAY
-DESCRIPTION:Світло вимкнуть через 15 хв (3.1)
+DESCRIPTION:Світло вимкнуть через 15 хв (5.2)
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:3.1-20261007T2000@cherkasy-power-outages-calendar
+UID:5.2-20261008T0000@cherkasy-power-outages-calendar
 DTSTAMP:20261009T000040Z
 LAST-MODIFIED:20261009T000040Z
-SEQUENCE:2
-DTSTART:20261007T200000Z
-DTEND:20261007T220000Z
-SUMMARY:💡 Світла не буде (3.1)
+SEQUENCE:0
+DTSTART:20261008T000000Z
+DTEND:20261008T020000Z
+SUMMARY:💡 Світла не буде (5.2)
 DESCRIPTION:Планове відключення світла\, черга
-  3.1. Дані з офіційного Telegram-каналу @pat_cherkasy
+  5.2. Дані з офіційного Telegram-каналу @pat_cherkasy
  oblenergo.
 TRANSP:TRANSPARENT
 STATUS:CONFIRMED
 BEGIN:VALARM
 TRIGGER:-PT15M
 ACTION:DISPLAY
-DESCRIPTION:Світло вимкнуть через 15 хв (3.1)
+DESCRIPTION:Світло вимкнуть через 15 хв (5.2)
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:3.1-20261008T0500@cherkasy-power-outages-calendar
+UID:5.2-20261008T0600@cherkasy-power-outages-calendar
 DTSTAMP:20261009T000040Z
 LAST-MODIFIED:20261009T000040Z
-SEQUENCE:2
-DTSTART:20261008T050000Z
+SEQUENCE:0
+DTSTART:20261008T060000Z
 DTEND:20261008T080000Z
-SUMMARY:💡 Світла не буде (3.1)
+SUMMARY:💡 Світла не буде (5.2)
 DESCRIPTION:Планове відключення світла\, черга
-  3.1. Дані з офіційного Telegram-каналу @pat_cherkasy
+  5.2. Дані з офіційного Telegram-каналу @pat_cherkasy
  oblenergo.
 TRANSP:TRANSPARENT
 STATUS:CONFIRMED
 BEGIN:VALARM
 TRIGGER:-PT15M
 ACTION:DISPLAY
-DESCRIPTION:Світло вимкнуть через 15 хв (3.1)
+DESCRIPTION:Світло вимкнуть через 15 хв (5.2)
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:3.1-20261008T1100@cherkasy-power-outages-calendar
+UID:5.2-20261008T1000@cherkasy-power-outages-calendar
 DTSTAMP:20261009T000040Z
 LAST-MODIFIED:20261009T000040Z
-SEQUENCE:2
-DTSTART:20261008T110000Z
-DTEND:20261008T140000Z
-SUMMARY:💡 Світла не буде (3.1)
+SEQUENCE:0
+DTSTART:20261008T100000Z
+DTEND:20261008T130000Z
+SUMMARY:💡 Світла не буде (5.2)
 DESCRIPTION:Планове відключення світла\, черга
-  3.1. Дані з офіційного Telegram-каналу @pat_cherkasy
+  5.2. Дані з офіційного Telegram-каналу @pat_cherkasy
  oblenergo.
 TRANSP:TRANSPARENT
 STATUS:CONFIRMED
 BEGIN:VALARM
 TRIGGER:-PT15M
 ACTION:DISPLAY
-DESCRIPTION:Світло вимкнуть через 15 хв (3.1)
+DESCRIPTION:Світло вимкнуть через 15 хв (5.2)
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:3.1-20261008T1600@cherkasy-power-outages-calendar
+UID:5.2-20261008T1600@cherkasy-power-outages-calendar
 DTSTAMP:20261009T000040Z
 LAST-MODIFIED:20261009T000040Z
-SEQUENCE:2
+SEQUENCE:0
 DTSTART:20261008T160000Z
 DTEND:20261008T180000Z
-SUMMARY:💡 Світла не буде (3.1)
+SUMMARY:💡 Світла не буде (5.2)
 DESCRIPTION:Планове відключення світла\, черга
-  3.1. Дані з офіційного Telegram-каналу @pat_cherkasy
+  5.2. Дані з офіційного Telegram-каналу @pat_cherkasy
  oblenergo.
 TRANSP:TRANSPARENT
 STATUS:CONFIRMED
 BEGIN:VALARM
 TRIGGER:-PT15M
 ACTION:DISPLAY
-DESCRIPTION:Світло вимкнуть через 15 хв (3.1)
+DESCRIPTION:Світло вимкнуть через 15 хв (5.2)
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:3.1-20261009T0000@cherkasy-power-outages-calendar
+UID:5.2-20261008T2000@cherkasy-power-outages-calendar
 DTSTAMP:20261009T000040Z
 LAST-MODIFIED:20261009T000040Z
-SEQUENCE:2
-DTSTART:20261009T000000Z
-DTEND:20261009T020000Z
-SUMMARY:💡 Світла не буде (3.1)
+SEQUENCE:0
+DTSTART:20261008T200000Z
+DTEND:20261008T220000Z
+SUMMARY:💡 Світла не буде (5.2)
 DESCRIPTION:Планове відключення світла\, черга
-  3.1. Дані з офіційного Telegram-каналу @pat_cherkasy
+  5.2. Дані з офіційного Telegram-каналу @pat_cherkasy
  oblenergo.
 TRANSP:TRANSPARENT
 STATUS:CONFIRMED
 BEGIN:VALARM
 TRIGGER:-PT15M
 ACTION:DISPLAY
-DESCRIPTION:Світло вимкнуть через 15 хв (3.1)
+DESCRIPTION:Світло вимкнуть через 15 хв (5.2)
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:3.1-20261009T1000@cherkasy-power-outages-calendar
+UID:5.2-20261009T0700@cherkasy-power-outages-calendar
 DTSTAMP:20261009T000040Z
 LAST-MODIFIED:20261009T000040Z
-SEQUENCE:2
-DTSTART:20261009T100000Z
-DTEND:20261009T120000Z
-SUMMARY:💡 Світла не буде (3.1)
+SEQUENCE:0
+DTSTART:20261009T070000Z
+DTEND:20261009T090000Z
+SUMMARY:💡 Світла не буде (5.2)
 DESCRIPTION:Планове відключення світла\, черга
-  3.1. Дані з офіційного Telegram-каналу @pat_cherkasy
+  5.2. Дані з офіційного Telegram-каналу @pat_cherkasy
  oblenergo.
 TRANSP:TRANSPARENT
 STATUS:CONFIRMED
 BEGIN:VALARM
 TRIGGER:-PT15M
 ACTION:DISPLAY
-DESCRIPTION:Світло вимкнуть через 15 хв (3.1)
+DESCRIPTION:Світло вимкнуть через 15 хв (5.2)
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:3.1-20261009T1600@cherkasy-power-outages-calendar
+UID:5.2-20261009T1600@cherkasy-power-outages-calendar
 DTSTAMP:20261009T000040Z
 LAST-MODIFIED:20261009T000040Z
-SEQUENCE:2
+SEQUENCE:0
 DTSTART:20261009T160000Z
 DTEND:20261009T180000Z
-SUMMARY:💡 Світла не буде (3.1)
+SUMMARY:💡 Світла не буде (5.2)
 DESCRIPTION:Планове відключення світла\, черга
-  3.1. Дані з офіційного Telegram-каналу @pat_cherkasy
+  5.2. Дані з офіційного Telegram-каналу @pat_cherkasy
  oblenergo.
 TRANSP:TRANSPARENT
 STATUS:CONFIRMED
 BEGIN:VALARM
 TRIGGER:-PT15M
 ACTION:DISPLAY
-DESCRIPTION:Світло вимкнуть через 15 хв (3.1)
+DESCRIPTION:Світло вимкнуть через 15 хв (5.2)
 END:VALARM
 END:VEVENT
 END:VCALENDAR
