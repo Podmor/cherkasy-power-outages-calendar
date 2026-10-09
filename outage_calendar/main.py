@@ -52,7 +52,7 @@ def run_queue(root: Path, cfg: dict, queue: str, schedule_posts: list[GpvPost], 
     for p in schedule_posts:
         # A queue that is not listed in a post has no outages in the part of the day it covers.
         if apply_post(state, p.day, p.queues.get(queue, []), p.post_id, p.posted_at, tz):
-            log(f"[{queue}] post {p.post_id}: {p.day} -> outage hours {state['days'][p.day]['hours']}")
+            log(f"[{queue}] post {p.post_id}: {p.day} -> outages (minutes) {state['days'][p.day]['ranges']}")
     prune_days(state, now.astimezone(tz).date())
 
     intervals = build_intervals(state["days"], tz)

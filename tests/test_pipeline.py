@@ -28,7 +28,15 @@ def _state(root, queue):
 
 
 def _days(root, queue):
-    return {k: v["hours"] for k, v in _state(root, queue)["days"].items()}
+    """Outage hours per day (these tests use whole hours only)."""
+    days = {}
+    for k, v in _state(root, queue)["days"].items():
+        hours = []
+        for a, b in v["ranges"]:
+            assert a % 60 == 0 and b % 60 == 0, (k, v)
+            hours += range(a // 60, b // 60)
+        days[k] = hours
+    return days
 
 
 def _events(root, queue="3.1"):
@@ -153,7 +161,7 @@ def test_schedule_update_edits_and_removes_events(tmp_path):
 
 def test_unreadable_newest_post_fails_the_run(tmp_path):
     root = _project(tmp_path)
-    ch = FakeChannel(POSTS + [(1810, "2026-10-09T10:00:00", HEAD_UPD_9, ["3.1 14:30 - 16:00"])])
+    ch = FakeChannel(POSTS + [(1810, "2026-10-09T10:00:00", HEAD_UPD_9, ["3.1 14:07 - 16:00"])])
     logs = []
     assert run(root, ch.html, NOW, logs.append) == 1
     assert any("post 1810" in m for m in logs)
@@ -161,9 +169,61 @@ def test_unreadable_newest_post_fails_the_run(tmp_path):
     assert _days(root, "3.1")["2026-10-09"] == [3, 4, 13, 14, 19, 20]
 
 
+REAL_HALF_HOUR_POST = [  # 9 Oct 16:57 Kyiv, the first post with outages on the half hour
+    "1.1 15:00 - 17:00, 20:00 - 22:30", "1.2 15:00 - 17:00, 21:00 - 23:00", "2.1 16:30 - 19:00",
+    "2.2 16:00 - 18:30, 23:00 - 00:00", "3.1 18:30 - 21:00", "3.2 19:00 - 21:00", "4.1 17:00 - 19:30",
+    "4.2 15:00 - 17:30, 21:30 - 24:00", "5.1 17:00 - 19:00, 22:30 - 24:00", "5.2 19:00 - 21:30",
+    "6.1 19:30 - 22:00", "6.2 17:30 - 20:00",
+]
+
+
+def test_half_hour_post_is_applied(tmp_path):
+    root = _project(tmp_path)
+    ch = FakeChannel(POSTS + [(1810, "2026-10-09T13:57:00", HEAD_UPD_9, REAL_HALF_HOUR_POST)])
+    assert run(root, ch.html, datetime(2026, 10, 9, 14, 0, tzinfo=timezone.utc), lambda m: None) == 0
+
+    state = _state(root, "1.1")["days"]["2026-10-09"]
+    assert state["post"] == 1810
+    assert state["ranges"][-2:] == [[900, 1020], [1200, 1350]]  # 15:00-17:00 and 20:00-22:30
+    _, events = _events(root, "1.1")
+    spans = {e["DTSTART"]: e["DTEND"] for e in events}
+    assert spans["20261009T170000Z"] == "20261009T193000Z"  # 20:00-22:30 Kyiv
+    _, events = _events(root, "2.1")
+    assert {e["DTSTART"]: e["DTEND"] for e in events}["20261009T133000Z"] == "20261009T160000Z"  # 16:30-19:00 Kyiv
+
+    # A second run on the same data changes nothing.
+    before = {p.name: p.read_bytes() for d in ("docs", "state") for p in (root / d).iterdir()}
+    run(root, ch.html, datetime(2026, 10, 9, 14, 15, tzinfo=timezone.utc), lambda m: None)
+    assert before == {p.name: p.read_bytes() for d in ("docs", "state") for p in (root / d).iterdir()}
+
+
+def test_state_with_whole_hours_is_migrated_to_minutes(tmp_path):
+    root = _project(tmp_path)
+    ch = FakeChannel()
+    run(root, ch.html, NOW, lambda m: None)
+    new_state = _state(root, "3.1")
+    expected = new_state["days"]["2026-10-09"]["ranges"]
+
+    # The same state as the bot wrote it before this change: "hours" instead of "ranges".
+    old = json.loads(json.dumps(new_state))
+    for info in old["days"].values():
+        hours = []
+        for a, b in info.pop("ranges"):
+            hours += range(a // 60, b // 60)
+        info["hours"] = hours
+    (root / "state" / "3.1.json").write_text(json.dumps(old), encoding="utf-8")
+    before_ics = (root / "docs" / "3.1.ics").read_bytes()
+
+    run(root, ch.html, NOW, lambda m: None)
+    migrated = _state(root, "3.1")
+    assert migrated["days"]["2026-10-09"]["ranges"] == expected
+    assert migrated == new_state  # nothing lost, event numbers unchanged
+    assert (root / "docs" / "3.1.ics").read_bytes() == before_ics
+
+
 def test_unreadable_old_post_does_not_fail_forever(tmp_path):
     root = _project(tmp_path)
-    broken = (1793, "2026-10-06T15:00:00", "Оновлений графік (ГПВ) на 6 жовтня. ", ["1.1 14:30 - 16:00"])
+    broken = (1793, "2026-10-06T15:00:00", "Оновлений графік (ГПВ) на 6 жовтня. ", ["1.1 14:07 - 16:00"])
     ch = FakeChannel(POSTS + [broken])
     assert run(root, ch.html, NOW, lambda m: None) == 0
 
