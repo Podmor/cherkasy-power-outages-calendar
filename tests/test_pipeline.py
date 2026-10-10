@@ -197,6 +197,22 @@ def test_half_hour_post_is_applied(tmp_path):
     assert before == {p.name: p.read_bytes() for d in ("docs", "state") for p in (root / d).iterdir()}
 
 
+def test_post_with_typos_in_labels_is_applied(tmp_path):
+    """Real post 1815 (10 Oct 19:58 Kyiv): "5.2." and "6.2." have a dot after the label; 2.1 is not listed."""
+    root = _project(tmp_path)
+    head = ("Через постійні ворожі обстріли за розпорядженням НЕК «Укренерго» 11 жовтня з 16:00 до 24:00 "
+            "у Черкаській області будуть застосовані графіки погодинних відключень (ГПВ).")
+    lines = ["1.1 16:00 - 18:00", "1.2 16:00 - 18:00", "2.2 20:00 - 22:00", "3.1 20:00 - 22:00",
+             "3.2 21:00 - 23:00", "4.1 22:00 - 24:00", "4.2 19:00 - 21:00", "5.1 23:00 - 24:00",
+             "5.2. 17:00 - 19:00", "6.1 18:00 - 20:00", "6.2. 18:00 - 20:00"]
+    ch = FakeChannel(POSTS + [(1815, "2026-10-10T16:58:00", head, lines)])
+    logs = []
+    assert run(root, ch.html, datetime(2026, 10, 10, 17, 0, tzinfo=timezone.utc), logs.append) == 0, logs
+    assert _state(root, "5.2")["days"]["2026-10-11"]["ranges"] == [[1020, 1140]]  # 17:00-19:00
+    assert _state(root, "6.2")["days"]["2026-10-11"]["ranges"] == [[1080, 1200]]
+    assert _state(root, "2.1")["days"]["2026-10-11"]["ranges"] == []  # not listed: no outages
+
+
 def test_state_with_whole_hours_is_migrated_to_minutes(tmp_path):
     root = _project(tmp_path)
     ch = FakeChannel()

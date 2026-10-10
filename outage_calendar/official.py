@@ -27,10 +27,12 @@ from .telegram import parse_caption_date
 
 MARKER = "Години відсутності електропостачання"
 
-# A queue label ("3.1") followed by its time ranges.
-_LABEL_RE = re.compile(r"(?<![\d.:])([1-9]\.[12])(?=\s+\d{1,2}:\d{2})")
-_RANGES_RE = re.compile(r"\s*((?:\d{1,2}:\d{2}\s*-\s*\d{1,2}:\d{2}\s*,?\s*)+)")
-_RANGE_RE = re.compile(r"(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})")
+# A queue label ("3.1") followed by its time ranges. The channel sometimes has typos:
+# a dot after the label ("5.2. 17:00 - 19:00") or a longer dash between the times.
+_DASH = "[-\u2010-\u2015\u2212]"  # hyphen, en dash, em dash, minus sign, ...
+_LABEL_RE = re.compile(r"(?<![\d.:])([1-9]\.[12])\.?(?=\s+\d{1,2}:\d{2})")
+_RANGES_RE = re.compile(rf"\s*((?:\d{{1,2}}:\d{{2}}\s*{_DASH}\s*\d{{1,2}}:\d{{2}}\s*,?\s*)+)")
+_RANGE_RE = re.compile(rf"(\d{{1,2}}):(\d{{2}})\s*{_DASH}\s*(\d{{1,2}}):(\d{{2}})")
 
 
 class OfficialParseError(Exception):

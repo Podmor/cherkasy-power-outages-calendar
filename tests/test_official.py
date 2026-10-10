@@ -40,6 +40,18 @@ def test_times_not_on_a_whole_hour_are_read():
     assert p.queues["4.2"] == [(900, 1050), (1290, 1440)]
 
 
+def test_typos_of_the_channel_are_tolerated():
+    # Real post 1815 (10 Oct 19:58 Kyiv): "5.2." and "6.2." have a dot after the label.
+    lines = ["1.1 16:00 - 18:00", "2.2 20:00 - 22:00", "5.1 23:00 - 24:00", "5.2. 17:00 - 19:00",
+             "6.1 18:00 - 20:00", "6.2. 18:00 - 20:00"]
+    p = _parse(post_html(HEAD_UPD_8, lines))
+    assert p.queues == {"1.1": _h(16, 17), "2.2": _h(20, 21), "5.1": _h(23), "5.2": _h(17, 18),
+                        "6.1": _h(18, 19), "6.2": _h(18, 19)}
+    # En dash, em dash and no spaces around the dash.
+    q = _parse(post_html(HEAD_UPD_8, ["1.1 16:00 \u2013 18:00, 20:00\u201422:00", "1.2 03:00-05:00"]))
+    assert q.queues == {"1.1": _h(16, 17, 20, 21), "1.2": _h(3, 4)}
+
+
 def test_range_ending_at_midnight_is_written_both_ways():
     a = _parse(post_html(HEAD_UPD_8, ["1.1 23:00 - 24:00", "1.2 23:00 - 00:00"]))
     assert a.queues["1.1"] == _h(23) and a.queues["1.2"] == _h(23)
