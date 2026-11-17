@@ -49,8 +49,16 @@ class GpvPost:
     queues: dict[str, list[tuple[int, int]]]
 
 
+# Temporary emergency schedules for other districts (e.g. Uman) use the same wording and the
+# same queue labels, but have no date and do not apply to the city: they are not our schedule.
+_TEMPORARY_RE = re.compile(r"тимчасов\w*\s+індивідуальн\w*\s+графік|аварійно-відновлювальн", re.IGNORECASE)
+
+
 def is_gpv(text: str) -> bool:
-    return MARKER in text
+    if MARKER not in text:
+        return False
+    head = text.partition(MARKER)[0]
+    return not _TEMPORARY_RE.search(head)
 
 
 def merge_ranges(ranges) -> list[tuple[int, int]]:

@@ -91,3 +91,16 @@ def test_noise_posts_are_not_schedules():
     from outage_calendar.official import is_gpv
     assert not any(is_gpv(h) for _, _, h, _ in NOISE)
     assert all(is_gpv(post_html(h, lines)) for _, _, h, lines in POSTS)
+
+
+def test_temporary_schedule_of_another_district_is_not_ours():
+    # Real post 2028 (17 Nov 2026): temporary schedules for the Uman district, no date.
+    from outage_calendar.official import is_gpv
+    text = ("Унаслідок ворожих атак на об’єкти енергетичної інфраструктури країни в частині Уманського району "
+            "на період виконання аварійно-відновлювальних робіт застосовуються тимчасові індивідуальні графіки "
+            "відключень електроенергії. Вони діють для споживачів ВСП «Уманські енергетичні мережі».\n\n"
+            "Години відсутності електропостачання:\n\n1.2 06:00 - 09:00, 12:00 - 15:00, 18:00 - 21:00\n\n"
+            "2.2 06:00 - 09:00, 12:00 - 15:00, 18:00 - 21:00")
+    assert not is_gpv(text)
+    # A normal schedule post is still read.
+    assert is_gpv(post_html(HEAD_UPD_8, ["1.1 10:00 - 11:00"]))
