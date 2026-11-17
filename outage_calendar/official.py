@@ -23,7 +23,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-from .telegram import parse_caption_date
+from .telegram import _DATE_RE, parse_caption_date
 
 MARKER = "Години відсутності електропостачання"
 
@@ -58,7 +58,8 @@ def is_gpv(text: str) -> bool:
     if MARKER not in text:
         return False
     head = text.partition(MARKER)[0]
-    return not _TEMPORARY_RE.search(head)
+    # A real schedule post names its day; a post for another district does not.
+    return bool(_DATE_RE.search(head)) or not _TEMPORARY_RE.search(head)
 
 
 def merge_ranges(ranges) -> list[tuple[int, int]]:
@@ -87,6 +88,11 @@ def _ranges(ranges_text: str) -> list[tuple[int, int]]:
 
 def parse_gpv(post_id: int, posted_at: datetime, text: str, tz: ZoneInfo) -> GpvPost:
     head, _, body = text.partition(MARKER)
+    # Some posts add a second list for another district (Uman) after ours: cut it off.
+    other = _TEMPORARY_RE.search(body)
+    if other:
+        body = body[:other.start()]
+    body = body.partition(MARKER)[0]
     day = parse_caption_date(head, posted_at, tz)
     if day is None:
         raise OfficialParseError("no date in the post header")
